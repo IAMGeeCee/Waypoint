@@ -4,8 +4,51 @@
 <!DOCTYPE html>
 
 <head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="~/css/site.css">
+
+    <style>
+        .ui {
+            bottom: 25px;
+            left: 25px;
+            background: purple;
+            border-radius: 5px;
+            position: absolute;
+            z-index: 1000;
+            padding: 15px;
+        }
+
+        .map-container {
+            position: relative;
+            height: 100%
+        }
+    </style>
 </head>
+
 <body>
-    
+
+    <div class="map-container">
+        <!-- The map -->
+        <div id="map" style="height: 100%;">
+
+        </div>
+
+        <!-- The UI --->
+        <form asp-controller="App" asp-action="CalculateDirections" method="post" class="ui">
+            <input type="text" name="coordinates" id="txtcoords" />
+            <input type="submit" value="submit" />
+        </form>
+    </div>
+
+
+    <!-- Javascript that loads the map (ai generated) -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map').setView([51.505, -0.09], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+    </script>
+
 </body>

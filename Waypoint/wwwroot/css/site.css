@@ -1,3 +1,9 @@
 body{
    background-color: #282a35;
+   height: 100%;
+   margin:0px;
+}
+
+html{
+   height: 100%;
 }
