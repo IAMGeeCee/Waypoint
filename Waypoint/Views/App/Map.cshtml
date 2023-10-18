@@ -1,5 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Map";
+    Layout = "~/Views/Shared/AppLayout.cshtml";
+
 }
 <!DOCTYPE html>
 
@@ -11,7 +13,7 @@
         .ui {
             bottom: 25px;
             left: 25px;
-            background: purple;
+            background: #282a35;
             border-radius: 5px;
             position: absolute;
             z-index: 1000;
@@ -20,7 +22,8 @@
 
         .map-container {
             position: relative;
-            height: 100%
+            height: 100%;
+            margin-left: 150px;
         }
     </style>
 </head>
@@ -35,8 +38,8 @@
 
         <!-- The UI --->
         <form asp-controller="App" asp-action="CalculateDirections" method="post" class="ui">
-            <input type="text" name="coordinates" id="txtcoords" />
-            <input type="submit" value="submit" />
+            <input type="text" name="coordinates" id="txtcoords" placeholder="long,lat"/>
+            <input type="submit" value="Navigate" />
         </form>
     </div>
 

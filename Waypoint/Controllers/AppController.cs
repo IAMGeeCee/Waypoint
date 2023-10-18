@@ -1,11 +1,13 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Waypoint.Controllers
 {
 
    public class AppController : Controller
    {
+
       public IActionResult Map()
       {
          return View();
