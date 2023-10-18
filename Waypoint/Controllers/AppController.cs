@@ -8,8 +8,16 @@ namespace Waypoint.Controllers
    public class AppController : Controller
    {
 
+      public IActionResult Index(){
+         return View();
+      }
+
       public IActionResult Map()
       {
+         return View();
+      }
+
+      public IActionResult Car(){
          return View();
       }
 
