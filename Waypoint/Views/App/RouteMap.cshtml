@@ -1,0 +1,181 @@
+﻿@{
+    ViewData["Title"] = "Map";
+    Layout = "~/Views/Shared/AppLayout.cshtml";
+
+}
+<!DOCTYPE html>
+
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="~/css/site.css">
+
+    <style>
+        .ui {
+            bottom: 25px;
+            left: 25px;
+            background: #282a35;
+            border-radius: 5px;
+            position: absolute;
+            z-index: 1000;
+            padding: 15px;
+        }
+
+        .map-container {
+            position: relative;
+            height: 100%;
+            margin-left: 150px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="map-container">
+        <!-- The map -->
+        <div id="map" style="height: 100%;">
+
+        </div>
+
+        <!-- The UI --->
+        <form asp-controller="App" asp-action="CalculateDirections" method="post" class="ui">
+            <input type="text" name="coordinates" id="txtcoords" placeholder="long,lat" />
+            <input type="submit" value="Navigate" />
+        </form>
+    </div>
+
+
+    <!-- Javascript that loads the map (ai generated) -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/polyline-encoded@0.0.6/dist/polyline.min.js"></script>
+
+
+    <!-- Load map -->
+    <script>
+        // Function to send data to the server
+        function sendDataToServer(data) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "@Url.Action("ReceiveLocation", "App")", true);
+            xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        // Handle the response from the server if needed
+                        console.log("Data received from the server:", xhr.responseText);
+                    } else {
+                        console.error("Error sending data to the server. Status: " + xhr.status);
+                    }
+                }
+            };
+
+            xhr.send(JSON.stringify(data));
+        }
+
+
+        // Initialize the map with default coordinates
+        var map = L.map('map').setView([51.505, -0.09], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+
+
+
+        // Check if the Geolocation API is available in the browser
+        if ("geolocation" in navigator) {
+            // Get the current position
+            navigator.geolocation.getCurrentPosition(function (position) {
+                // Retrieve latitude and longitude from the position object
+                var latitude = position.coords.latitude;
+                var longitude = position.coords.longitude;
+
+                // Update the map view with the user's coordinates
+                map.setView([latitude, longitude], 13);
+
+                // Do something with the latitude and longitude
+                console.log("Latitude: " + latitude);
+                console.log("Longitude: " + longitude);
+                sendDataToServer(latitude.toString() + "," + longitude.toString());
+            }, function (error) {
+                // Handle any errors that occur when trying to get the location
+                console.error("Error getting location: " + error.message);
+            });
+        }
+        else {
+            // Geolocation is not available in this browser
+            console.error("Geolocation is not supported in this browser.");
+        }
+    </script>
+
+    <!-- Draw route on map -->
+    <script>
+        var jsonData = @Html.Raw(Model);
+        drawRoute(jsonData);
+
+
+        // Define a function to decode an encoded polyline
+        function decodePolyline(encoded) {
+            var poly = [];
+            var index = 0;
+            var lat = 0;
+            var lng = 0;
+
+            while (index < encoded.length) {
+                var shift = 0;
+                var result = 0;
+
+                do {
+                    var b = encoded.charCodeAt(index++) - 63;
+                    result |= (b & 0x1f) << shift;
+                    shift += 5;
+                } while (b >= 0x20);
+
+                var dlat = ((result & 1) !== 0 ? ~(result >> 1) : (result >> 1));
+                lat += dlat;
+
+                shift = 0;
+                result = 0;
+
+                do {
+                    var b = encoded.charCodeAt(index++) - 63;
+                    result |= (b & 0x1f) << shift;
+                    shift += 5;
+                } while (b >= 0x20);
+
+                var dlng = ((result & 1) !== 0 ? ~(result >> 1) : (result >> 1));
+                lng += dlng;
+
+                var point = [lat * 1e-5, lng * 1e-5];
+                poly.push(point);
+            }
+
+            return poly;
+        }
+
+        // Define the drawRoute function to draw the route on the map
+        function drawRoute(routeData) {
+            // Ensure you have the map object created
+            if (typeof map !== 'undefined') {
+                // Clear any existing route if needed
+                if (typeof routeLayer !== 'undefined') {
+                    map.removeLayer(routeLayer);
+                }
+
+                // Extract the encoded polyline from the route data
+                var encodedPolyline = routeData.paths[0].points;
+
+                // Decode the encoded polyline using the custom decode function
+                var coordinates = decodePolyline(encodedPolyline);
+
+                // Create a polyline using Leaflet
+                routeLayer = L.polyline(coordinates, { color: 'blue' }).addTo(map);
+
+                // Fit the map to the bounds of the route
+                map.fitBounds(routeLayer.getBounds());
+            }
+        }
+
+
+    </script>
+</body>

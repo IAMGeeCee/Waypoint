@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "google-polyline": "^1.0.3"
+  }
+}
