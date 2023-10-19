@@ -53,7 +53,7 @@ namespace Waypoint.Controllers
             if (response.IsSuccessStatusCode)
             {
                string json = await response.Content.ReadAsStringAsync();
-               return View("RouteMap",json);
+               return View("Map",json);
             }
             else
             {

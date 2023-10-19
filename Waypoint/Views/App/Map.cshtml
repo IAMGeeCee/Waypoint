@@ -46,7 +46,8 @@
 
     <!-- Javascript that loads the map (ai generated) -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>    
+    <script src="https://cdn.jsdelivr.net/npm/polyline-encoded@0.0.6/dist/polyline.min.js"></script>
     <script>
         // Function to send data to the server
         function sendDataToServer(data) {
@@ -103,5 +104,75 @@
             // Geolocation is not available in this browser
             console.error("Geolocation is not supported in this browser.");
         }
+    </script>
+    <!-- Draw route on map -->
+    <script>
+        var jsonData = @Html.Raw(Model);
+        drawRoute(jsonData);
+
+
+        // Define a function to decode an encoded polyline
+        function decodePolyline(encoded) {
+            var poly = [];
+            var index = 0;
+            var lat = 0;
+            var lng = 0;
+
+            while (index < encoded.length) {
+                var shift = 0;
+                var result = 0;
+
+                do {
+                    var b = encoded.charCodeAt(index++) - 63;
+                    result |= (b & 0x1f) << shift;
+                    shift += 5;
+                } while (b >= 0x20);
+
+                var dlat = ((result & 1) !== 0 ? ~(result >> 1) : (result >> 1));
+                lat += dlat;
+
+                shift = 0;
+                result = 0;
+
+                do {
+                    var b = encoded.charCodeAt(index++) - 63;
+                    result |= (b & 0x1f) << shift;
+                    shift += 5;
+                } while (b >= 0x20);
+
+                var dlng = ((result & 1) !== 0 ? ~(result >> 1) : (result >> 1));
+                lng += dlng;
+
+                var point = [lat * 1e-5, lng * 1e-5];
+                poly.push(point);
+            }
+
+            return poly;
+        }
+
+        // Define the drawRoute function to draw the route on the map
+        function drawRoute(routeData) {
+            // Ensure you have the map object created
+            if (typeof map !== 'undefined') {
+                // Clear any existing route if needed
+                if (typeof routeLayer !== 'undefined') {
+                    map.removeLayer(routeLayer);
+                }
+
+                // Extract the encoded polyline from the route data
+                var encodedPolyline = routeData.paths[0].points;
+
+                // Decode the encoded polyline using the custom decode function
+                var coordinates = decodePolyline(encodedPolyline);
+
+                // Create a polyline using Leaflet
+                routeLayer = L.polyline(coordinates, { color: 'blue' }).addTo(map);
+
+                // Fit the map to the bounds of the route
+                map.fitBounds(routeLayer.getBounds());
+            }
+        }
+
+
     </script>
 </body>
