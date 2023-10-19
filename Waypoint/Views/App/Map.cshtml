@@ -44,9 +44,9 @@
     </div>
 
 
-    <!-- Javascript that loads the map (ai generated) -->
+    <!-- Javascript that loads the map -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/polyline-encoded@0.0.6/dist/polyline.min.js"></script>
     <script>
         // Function to send data to the server
@@ -77,9 +77,9 @@
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        
-        
-        
+
+
+
         // Check if the Geolocation API is available in the browser
         if ("geolocation" in navigator) {
             // Get the current position
@@ -94,7 +94,13 @@
                 // Do something with the latitude and longitude
                 console.log("Latitude: " + latitude);
                 console.log("Longitude: " + longitude);
-                sendDataToServer(latitude.toString()+","+longitude.toString());
+                sendDataToServer(latitude.toString() + "," + longitude.toString());
+                var marker = L.marker([latitude, longitude]).addTo(map);
+                var circle = L.circle([latitude, longitude], 500, {
+                    color: 'red',
+                    fillColor: '#f03',
+                    fillOpacity: 0.5
+                }).addTo(map);
             }, function (error) {
                 // Handle any errors that occur when trying to get the location
                 console.error("Error getting location: " + error.message);
