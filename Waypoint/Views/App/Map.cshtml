@@ -38,7 +38,7 @@
 
         <!-- The UI --->
         <form asp-controller="App" asp-action="CalculateDirections" method="post" class="ui">
-            <input type="text" name="coordinates" id="txtcoords" placeholder="long,lat"/>
+            <input type="text" name="coordinates" id="txtcoords" placeholder="long,lat" />
             <input type="submit" value="Navigate" />
         </form>
     </div>
@@ -46,12 +46,62 @@
 
     <!-- Javascript that loads the map (ai generated) -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        var map = L.map('map').setView([51.505, -0.09], 13);
+        // Function to send data to the server
+        function sendDataToServer(data) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "@Url.Action("ReceiveLocation", "App")", true);
+            xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
 
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        // Handle the response from the server if needed
+                        console.log("Data received from the server:", xhr.responseText);
+                    } else {
+                        console.error("Error sending data to the server. Status: " + xhr.status);
+                    }
+                }
+            };
+
+            xhr.send(JSON.stringify(data));
+        }
+
+
+
+        // Initialize the map with default coordinates
+        var map = L.map('map').setView([51.505, -0.09], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
-    </script>
 
+        
+        
+        
+        // Check if the Geolocation API is available in the browser
+        if ("geolocation" in navigator) {
+            // Get the current position
+            navigator.geolocation.getCurrentPosition(function (position) {
+                // Retrieve latitude and longitude from the position object
+                var latitude = position.coords.latitude;
+                var longitude = position.coords.longitude;
+
+                // Update the map view with the user's coordinates
+                map.setView([latitude, longitude], 13);
+
+                // Do something with the latitude and longitude
+                console.log("Latitude: " + latitude);
+                console.log("Longitude: " + longitude);
+                sendDataToServer(latitude.toString()+","+longitude.toString());
+            }, function (error) {
+                // Handle any errors that occur when trying to get the location
+                console.error("Error getting location: " + error.message);
+            });
+        }
+        else {
+            // Geolocation is not available in this browser
+            console.error("Geolocation is not supported in this browser.");
+        }
+    </script>
 </body>

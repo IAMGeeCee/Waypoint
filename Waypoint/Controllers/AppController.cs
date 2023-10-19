@@ -1,14 +1,28 @@
-﻿using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System;
+using System.Diagnostics;
+using System.Net;
 
 namespace Waypoint.Controllers
 {
-
+   public class LocationData
+   {
+      public double Latitude { get; set; }
+      public double Longitude { get; set; }
+   }
+   
    public class AppController : Controller
    {
+      [HttpPost]
+      public IActionResult ReceiveLocation([FromBody] string data)
+      {
+         HttpContext.Session.SetString("CurrentLocation", data);
+         return Content("Data received successfully: " + data);
+      }
 
-      public IActionResult Index(){
+      public IActionResult Index()
+      {
          return View();
       }
 
@@ -17,19 +31,20 @@ namespace Waypoint.Controllers
          return View();
       }
 
-      public IActionResult Car(){
-         return View();
-      }
-
-      public IActionResult ShowDirections(string json)
+      public IActionResult Car()
       {
-         return Content(json);
+         return View();
       }
 
       public async Task<IActionResult> CalculateDirections(string coordinates)
       {
+         double Longitude;
+         Longitude = Convert.ToDouble(HttpContext.Session.GetString("CurrentLocation").Split(',')[0]);
+         double Latitude = Convert.ToDouble(HttpContext.Session.GetString("CurrentLocation").Split(',')[1]);
+
+
          string apiKey = "88ed98eb-c3dc-4b84-be54-f3862db93f24";
-         string apiUrl = $"https://graphhopper.com/api/1/route?point=51.5074,-0.1278&point={coordinates}&vehicle=car&locale=en&key={apiKey}";
+         string apiUrl = $"https://graphhopper.com/api/1/route?point={Longitude},{Latitude}&point={coordinates}&vehicle=car&locale=en&key={apiKey}";
 
          using (HttpClient client = new HttpClient())
          {
