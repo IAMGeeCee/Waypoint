@@ -49,6 +49,7 @@ namespace Waypoint.Controllers
 
          string apiKey = "88ed98eb-c3dc-4b84-be54-f3862db93f24";
          string apiUrl = $"https://graphhopper.com/api/1/route?point={Longitude},{Latitude}&point={coordinates}&vehicle=car&locale=en&key={apiKey}";
+         string otherUrl = $"https://graphhopper.com/api/1/route?profile=car&point={Longitude},{Latitude}&point={coordinates}&curbside=any&locale=en&elevation=false&optimize=false&instructions=true&calc_points=true&debug=false&points_encoded=true&ch.disable=false&heading=0&heading_penalty=120&pass_through=false&algorithm=round_trip&round_trip.distance=10000&round_trip.seed=0&alternative_route.max_paths=2&alternative_route.max_weight_factor=1.4&alternative_route.max_share_factor=0.6&key={apiKey}";
 
          using (HttpClient client = new HttpClient())
          {

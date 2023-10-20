@@ -217,15 +217,55 @@
         var instructionText = document.getElementById("instruction-text");
         var nextInstructionBtn = document.getElementById("next-instruction-btn");
         var currentStep = 0;
+        var stepCoordinates = [];
+
+        function extractStepCoordinates() {
+            // Loop through your instructions array and extract coordinates
+            for (var i = 0; i < instructions.length; i++) {
+                // Extract coordinates for each step (modify this part based on your JSON structure)
+                var step = instructions[i];
+                var coordinates = extractCoordinatesFromStep(step);
+                stepCoordinates.push(coordinates);
+            }
+        }
+        function extractCoordinatesFromStep(step) {
+    console.log("Step:", step); // Log the step object to inspect its structure
+
+    if (step && step.points) {
+        // The "points" property in your JSON contains encoded coordinates
+        var encodedPoints = step.points;
+
+        // Decode the encoded polyline to get an array of [latitude, longitude] coordinates
+        var coordinates = decodePolyline(encodedPoints);
+
+        if (coordinates.length > 0) {
+            // Return the first coordinate (or any other coordinate that you want to use for centering)
+            return coordinates[0];
+        }
+    }
+
+    // Return null or a default coordinate if the data is not available
+    return null;
+}
+
 
         // Function to display the current instruction
         function displayCurrentInstruction() {
             document.getElementById("frm-nav-input").style.display = "none";
             document.getElementById("directions-container").style.display = "block";
+            extractStepCoordinates();
             var currentInstruction = instructions[currentStep];
             if (currentInstruction) {
                 var stepNumber = currentStep + 1;
                 instructionText.innerHTML = "Step " + stepNumber + ": " + currentInstruction.text;
+
+                // Get the coordinates for the current step
+                var stepCoordinate = stepCoordinates[currentStep];
+
+                // Center the map on the current step's coordinates
+                if (stepCoordinate) {
+                    map.setView(stepCoordinate, 15);
+                }
 
                 var msg = new SpeechSynthesisUtterance();
                 msg.text = currentInstruction.text;
