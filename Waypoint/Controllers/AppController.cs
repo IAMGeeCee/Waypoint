@@ -36,6 +36,10 @@ namespace Waypoint.Controllers
          return View();
       }
 
+      public IActionResult MobileMenu(){
+         return View();
+      }
+
       public async Task<IActionResult> CalculateDirections(string coordinates)
       {
          double Longitude;

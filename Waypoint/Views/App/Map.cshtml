@@ -24,6 +24,22 @@
             position: relative;
             height: 100%;
         }
+
+        .back{
+            display:none;
+        }
+
+        @@media(pointer: none), (pointer:coarse) {
+            .directionsbox{
+                margin-left:60px
+            }
+
+            .back{
+                width: 55px;height: 60px;text-align: left;display:block !important;              
+            }
+        }
+
+
     </style>
 </head>
 
@@ -36,10 +52,13 @@
         </div>
 
         <!-- The UI --->
-        <form asp-controller="App" asp-action="CalculateDirections" method="post" class="ui">
+        <form asp-controller="App" asp-action="CalculateDirections" method="post" class="ui directionsbox">
             <input type="text" name="coordinates" id="txtcoords" placeholder="long,lat" />
             <input type="submit" value="Navigate" />
         </form>
+
+        <a class="ui back" href="/App/MobileMenu"><i
+                class="fa-solid fa-arrow-left"></i></a>
     </div>
 
 
