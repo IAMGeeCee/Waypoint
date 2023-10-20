@@ -124,12 +124,12 @@
                 console.log("Latitude: " + latitude);
                 console.log("Longitude: " + longitude);
                 sendDataToServer(latitude.toString() + "," + longitude.toString());
-                var marker = L.marker([latitude, longitude]).addTo(map);
-                var circle = L.circle([latitude, longitude], 500, {
-                    color: 'red',
-                    fillColor: '#f03',
-                    fillOpacity: 0.5
-                }).addTo(map);
+                //var marker = L.marker([latitude, longitude]).addTo(map);
+                //var circle = L.circle([latitude, longitude], 500, {
+                //   color: 'red',
+                //   fillColor: '#f03',
+                //fillOpacity: 0.5
+                // }).addTo(map);
             }, function (error) {
                 // Handle any errors that occur when trying to get the location
                 console.error("Error getting location: " + error.message);
@@ -229,24 +229,24 @@
             }
         }
         function extractCoordinatesFromStep(step) {
-    console.log("Step:", step); // Log the step object to inspect its structure
+            console.log("Step:", step); // Log the step object to inspect its structure
 
-    if (step && step.points) {
-        // The "points" property in your JSON contains encoded coordinates
-        var encodedPoints = step.points;
+            if (step && step.points) {
+                // The "points" property in your JSON contains encoded coordinates
+                var encodedPoints = step.points;
 
-        // Decode the encoded polyline to get an array of [latitude, longitude] coordinates
-        var coordinates = decodePolyline(encodedPoints);
+                // Decode the encoded polyline to get an array of [latitude, longitude] coordinates
+                var coordinates = decodePolyline(encodedPoints);
 
-        if (coordinates.length > 0) {
-            // Return the first coordinate (or any other coordinate that you want to use for centering)
-            return coordinates[0];
+                if (coordinates.length > 0) {
+                    // Return the first coordinate (or any other coordinate that you want to use for centering)
+                    return coordinates[0];
+                }
+            }
+
+            // Return null or a default coordinate if the data is not available
+            return null;
         }
-    }
-
-    // Return null or a default coordinate if the data is not available
-    return null;
-}
 
 
         // Function to display the current instruction
@@ -294,4 +294,40 @@
         });
     </script>
 
+    <!-- Live location -->
+    <script>
+
+        var liveLocationMarker = L.marker([0, 0]).addTo(map);
+        // Function to continuously update the user's location
+        function updateLocation() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.watchPosition(function (position) {
+                    // Retrieve the updated latitude and longitude
+                    var latitude = position.coords.latitude;
+                    var longitude = position.coords.longitude;
+
+                    // Update the map view with the user's updated coordinates
+                    map.setView([latitude, longitude]);
+
+                    // Update the live location marker
+                    liveLocationMarker.setLatLng([latitude, longitude]);
+                }, function (error) {
+                    // Handle any errors that occur when trying to get the updated location
+                    console.error("Error updating location: " + error.message);
+                }, {
+        enableHighAccuracy: true,  // Use high-accuracy if available
+        maximumAge: 0,             // Disable caching
+        timeout: 1             // Update location every 30 seconds
+    }
+                );
+            } else {
+                // Geolocation is not available in this browser
+                console.error("Geolocation is not supported in this browser.");
+            }
+        }
+
+        // Call the updateLocation function to start tracking the user's location
+        updateLocation();
+
+    </script>
 </body>
