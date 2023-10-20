@@ -1,8 +1,8 @@
 ﻿@{
     ViewData["Title"] = "Map";
     Layout = "~/Views/Shared/AppLayout.cshtml";
-
 }
+
 <!DOCTYPE html>
 
 <head>
@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="~/css/site.css">
 
     <style>
-        .ui {
+        .ui-container {
             bottom: 25px;
             left: 25px;
             background: #282a35;
@@ -25,21 +25,30 @@
             height: 100%;
         }
 
-        .back{
-            display:none;
+        .back-button {
+            display: none;
         }
 
-        @@media(pointer: none), (pointer:coarse) {
-            .directionsbox{
-                margin-left:60px
+        @@media (pointer: none), (pointer: coarse) {
+            .direction-input-container {
+                margin-left: 60px;
             }
 
-            .back{
-                width: 55px;height: 60px;text-align: left;display:block !important;              
+            .back-button {
+                width: 55px;
+                height: 60px;
+                text-align: left;
+                display: block !important;
+            }
+
+            .directions-box {
+                margin-left: 60px;
             }
         }
 
-
+        .directions-box {
+            display: none;
+        }
     </style>
 </head>
 
@@ -47,25 +56,32 @@
 
     <div class="map-container">
         <!-- The map -->
-        <div id="map" style="height: 100%;">
+        <div id="map" style="height: 100%;"></div>
 
-        </div>
-
-        <!-- The UI --->
-        <form asp-controller="App" asp-action="CalculateDirections" method="post" class="ui directionsbox">
-            <input type="text" name="coordinates" id="txtcoords" placeholder="long,lat" />
-            <input type="submit" value="Navigate" />
+        <!-- The UI -->
+        <form asp-controller="App" asp-action="CalculateDirections" method="post"
+            class="ui-container direction-input-container" id="frm-nav-input">
+            <input type="text" name="coordinates" id="txt-coordinates" placeholder="long,lat" />
+            <input type="submit" value="Navigate" id="btn-start-navigation" />
         </form>
 
-        <a class="ui back" href="/App/MobileMenu"><i
-                class="fa-solid fa-arrow-left"></i></a>
-    </div>
+        <a class="ui-container back-button" href="/App/MobileMenu">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
 
+        <div id="directions-container" class="ui-container directions-box"
+            style="height: 100px; width: 500px; color: white; ">
+            <p id="instruction-text">Step 1: Loading directions...</p>
+            <button id="next-instruction-btn">Next Instruction</button>
+        </div>
+
+    </div>
 
     <!-- Javascript that loads the map -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/polyline-encoded@0.0.6/dist/polyline.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/polyline-encoded@0.0.6/dist/polyline.min.js"> </script>
+
     <script>
         // Function to send data to the server
         function sendDataToServer(data) {
@@ -87,15 +103,11 @@
             xhr.send(JSON.stringify(data));
         }
 
-
-
         // Initialize the map with default coordinates
         var map = L.map('map').setView([51.505, -0.09], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
-
-
 
         // Check if the Geolocation API is available in the browser
         if ("geolocation" in navigator) {
@@ -127,13 +139,12 @@
             // Geolocation is not available in this browser
             console.error("Geolocation is not supported in this browser.");
         }
-
     </script>
+
     <!-- Draw route on map -->
     <script>
         var jsonData = @Html.Raw(Model);
         drawRoute(jsonData);
-
 
         // Define a function to decode an encoded polyline
         function decodePolyline(encoded) {
@@ -196,8 +207,46 @@
                 map.fitBounds(routeLayer.getBounds());
             }
         }
+    </script>
 
+    <!-- Show step-by-step instructions -->
+    <script>
+        var jsonData = @Html.Raw(Model);
+        var instructions = jsonData.paths[0].instructions;
+        var directionsContainer = document.getElementById("directions-container");
+        var instructionText = document.getElementById("instruction-text");
+        var nextInstructionBtn = document.getElementById("next-instruction-btn");
+        var currentStep = 0;
 
+        // Function to display the current instruction
+        function displayCurrentInstruction() {
+            document.getElementById("frm-nav-input").style.display = "none";
+            document.getElementById("directions-container").style.display = "block";
+            var currentInstruction = instructions[currentStep];
+            if (currentInstruction) {
+                var stepNumber = currentStep + 1;
+                instructionText.innerHTML = "Step " + stepNumber + ": " + currentInstruction.text;
+            } else {
+                instructionText.innerHTML = "You've reached your destination.";
+
+                // Show location input again if you've reached your destination
+                document.getElementById("frm-nav-input").style.display = "block";
+                document.getElementById("directions-container").style.display = "none";
+
+                if (typeof routeLayer !== 'undefined') {
+                    map.removeLayer(routeLayer);
+                }
+            }
+        }
+
+        // Initial display of the first instruction
+        displayCurrentInstruction();
+
+        // Handle the "Next Instruction" button click
+        nextInstructionBtn.addEventListener("click", function () {
+            currentStep++;
+            displayCurrentInstruction();
+        });
     </script>
 
 </body>
