@@ -226,6 +226,11 @@
             if (currentInstruction) {
                 var stepNumber = currentStep + 1;
                 instructionText.innerHTML = "Step " + stepNumber + ": " + currentInstruction.text;
+
+                var msg = new SpeechSynthesisUtterance();
+                msg.text = currentInstruction.text;
+                window.speechSynthesis.speak(msg);
+
             } else {
                 instructionText.innerHTML = "You've reached your destination.";
 
