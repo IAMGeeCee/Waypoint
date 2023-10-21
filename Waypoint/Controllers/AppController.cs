@@ -40,7 +40,7 @@ namespace Waypoint.Controllers
          return View();
       }
 
-      public async Task<IActionResult> CalculateDirections(string coordinates)
+      public async Task<IActionResult> CalculateDirections(string currentcoordinates,string coordinates)
       {
          double Longitude;
          Longitude = Convert.ToDouble(HttpContext.Session.GetString("CurrentLocation").Split(',')[0]);
@@ -48,7 +48,7 @@ namespace Waypoint.Controllers
 
 
          string apiKey = "88ed98eb-c3dc-4b84-be54-f3862db93f24";
-         string apiUrl = $"https://graphhopper.com/api/1/route?point={Longitude},{Latitude}&point={coordinates}&vehicle=car&locale=en&key={apiKey}&instructions=true&point_hint=0.0&point_hint=1.0";
+         string apiUrl = $"https://graphhopper.com/api/1/route?point={currentcoordinates}&point={coordinates}&vehicle=car&locale=en&key={apiKey}&instructions=true&point_hint=0.0&point_hint=1.0";
         
          using (HttpClient client = new HttpClient())
          {

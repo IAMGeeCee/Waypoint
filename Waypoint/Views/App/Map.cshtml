@@ -61,6 +61,7 @@
         <!-- The UI -->
         <form asp-controller="App" asp-action="CalculateDirections" method="post"
             class="ui-container direction-input-container" id="frm-nav-input">
+            <input type=text name="currentcoordinates" id="currentcoordinates" />
             <input type="text" name="coordinates" id="txt-coordinates" placeholder="long,lat" />
             <input type="submit" value="Navigate" id="btn-start-navigation" />
         </form>
@@ -311,14 +312,20 @@
 
                     // Update the live location marker
                     liveLocationMarker.setLatLng([latitude, longitude]);
+
+                    //Update the Current position text box in the form
+                    document.getElementById("currentcoordinates").setAttribute("Value", latitude + "," + longitude)
+
+
+
                 }, function (error) {
                     // Handle any errors that occur when trying to get the updated location
                     console.error("Error updating location: " + error.message);
                 }, {
-        enableHighAccuracy: true,  // Use high-accuracy if available
-        maximumAge: 0,             // Disable caching
-        timeout: 1             // Update location every 30 seconds
-    }
+                    enableHighAccuracy: true,  // Use high-accuracy if available
+                    maximumAge: 0,             // Disable caching
+                    timeout: 1             // Update location every 30 seconds
+                }
                 );
             } else {
                 // Geolocation is not available in this browser
