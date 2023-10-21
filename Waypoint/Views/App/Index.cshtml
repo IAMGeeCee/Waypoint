@@ -7,8 +7,46 @@
 
 <head>
     <link rel="stylesheet" href="~/css/site.css">
+    <style>
+        .content {
+            padding: 25px;
+            background: white;
+            color: black;
+            height: 100%;
+            width: 100%;
+        }
+
+        .menu-button {
+            visibility: collapse;
+        }
+
+        @@media (pointer: none), (pointer: coarse) {
+            .menu-button {
+                visibility: visible;
+                width: 55px;
+                height: 60px;
+                text-align: left;
+                display: block !important;
+                bottom: 25px;
+                left: 25px;
+                background: #282a35;
+                border-radius: 5px;
+                position: absolute;
+                z-index: 1000;
+                padding: 15px;
+            }
+        }
+
+    </style>
 </head>
 
 <body>
-    <h1>Welcome to Waypoint</h1>
+    <div class="content">
+        <!-- Menu button on mobile -->
+        <a class="menu-button" href="/App/MobileMenu">
+            <i class="fa-solid fa-bars"></i>
+        </a>
+
+        <h1>Welcome to Waypoint</h1>
+    </div>
 </body>

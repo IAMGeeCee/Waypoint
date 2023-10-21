@@ -62,7 +62,7 @@
         <!-- The input for navigation -->
         <form asp-controller="App" asp-action="CalculateDirections" method="post"
             class="ui-container direction-input-container" id="frm-nav-input">
-            <input type=text name="currentcoordinates" id="currentcoordinates" />
+            <input type="hidden" name="currentcoordinates" id="currentcoordinates" />
             <input type="text" name="coordinates" id="txt-coordinates" placeholder="long,lat" />
             <input type="submit" value="Navigate" id="btn-start-navigation" />
         </form>
