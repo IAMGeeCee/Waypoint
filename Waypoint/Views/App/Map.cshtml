@@ -54,11 +54,12 @@
 
 <body>
 
+    <!-- ALL UI MUST GO IN HERE -->
     <div class="map-container">
         <!-- The map -->
         <div id="map" style="height: 100%;"></div>
 
-        <!-- The UI -->
+        <!-- The input for navigation -->
         <form asp-controller="App" asp-action="CalculateDirections" method="post"
             class="ui-container direction-input-container" id="frm-nav-input">
             <input type=text name="currentcoordinates" id="currentcoordinates" />
@@ -66,10 +67,13 @@
             <input type="submit" value="Navigate" id="btn-start-navigation" />
         </form>
 
+
+        <!-- Back button on mobile -->
         <a class="ui-container back-button" href="/App/MobileMenu">
             <i class="fa-solid fa-arrow-left"></i>
         </a>
 
+        <!-- Box that contains the directions -->
         <div id="directions-container" class="ui-container directions-box"
             style="height: 100px; width: 500px; color: white; ">
             <p id="instruction-text">Step 1: Loading directions...</p>
@@ -78,11 +82,16 @@
 
     </div>
 
-    <!-- Javascript that loads the map -->
+
+    <!-- SCRIPTS -->
+    <!-- -------------------------------------------------------------------------------------------------------------------------------------- -->
+
+    <!-- Dependancies -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/polyline-encoded@0.0.6/dist/polyline.min.js"> </script>
-
+    
+    <!-- Script that loads the map -->
     <script>
         // Function to send data to the server
         function sendDataToServer(data) {
@@ -103,17 +112,19 @@
 
             xhr.send(JSON.stringify(data));
         }
-
+        
         // Initialize the map with default coordinates
         var map = L.map('map').setView([51.505, -0.09], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        // Check if the Geolocation API is available in the browser
+
+        // Gets the users location at the start (No longer needed as of live location)
         if ("geolocation" in navigator) {
             // Get the current position
-            navigator.geolocation.getCurrentPosition(function (position) {
+            navigator.geolocation.getCurrentPosition(
+            function (position) {
                 // Retrieve latitude and longitude from the position object
                 var latitude = position.coords.latitude;
                 var longitude = position.coords.longitude;
@@ -121,17 +132,13 @@
                 // Update the map view with the user's coordinates
                 map.setView([latitude, longitude], 13);
 
-                // Do something with the latitude and longitude
                 console.log("Latitude: " + latitude);
                 console.log("Longitude: " + longitude);
                 sendDataToServer(latitude.toString() + "," + longitude.toString());
-                //var marker = L.marker([latitude, longitude]).addTo(map);
-                //var circle = L.circle([latitude, longitude], 500, {
-                //   color: 'red',
-                //   fillColor: '#f03',
-                //fillOpacity: 0.5
-                // }).addTo(map);
-            }, function (error) {
+
+
+            },
+            function (error) {
                 // Handle any errors that occur when trying to get the location
                 console.error("Error getting location: " + error.message);
             });
@@ -210,69 +217,41 @@
         }
     </script>
 
-    <!-- Show step-by-step instructions -->
+    <!-- Show step-by-step navigation instructions -->
     <script>
+
+        // Variables
         var jsonData = @Html.Raw(Model);
         var instructions = jsonData.paths[0].instructions;
         var directionsContainer = document.getElementById("directions-container");
         var instructionText = document.getElementById("instruction-text");
         var nextInstructionBtn = document.getElementById("next-instruction-btn");
         var currentStep = 0;
-        var stepCoordinates = [];
-
-        function extractStepCoordinates() {
-            // Loop through your instructions array and extract coordinates
-            for (var i = 0; i < instructions.length; i++) {
-                // Extract coordinates for each step (modify this part based on your JSON structure)
-                var step = instructions[i];
-                var coordinates = extractCoordinatesFromStep(step);
-                stepCoordinates.push(coordinates);
-            }
-        }
-        function extractCoordinatesFromStep(step) {
-            console.log("Step:", step); // Log the step object to inspect its structure
-
-            if (step && step.points) {
-                // The "points" property in your JSON contains encoded coordinates
-                var encodedPoints = step.points;
-
-                // Decode the encoded polyline to get an array of [latitude, longitude] coordinates
-                var coordinates = decodePolyline(encodedPoints);
-
-                if (coordinates.length > 0) {
-                    // Return the first coordinate (or any other coordinate that you want to use for centering)
-                    return coordinates[0];
-                }
-            }
-
-            // Return null or a default coordinate if the data is not available
-            return null;
-        }
-
 
         // Function to display the current instruction
         function displayCurrentInstruction() {
+            //Hide navigation input box
             document.getElementById("frm-nav-input").style.display = "none";
             document.getElementById("directions-container").style.display = "block";
-            extractStepCoordinates();
+
+
             var currentInstruction = instructions[currentStep];
             if (currentInstruction) {
+
+                //Update step instructions
                 var stepNumber = currentStep + 1;
                 instructionText.innerHTML = "Step " + stepNumber + ": " + currentInstruction.text;
 
-                // Get the coordinates for the current step
-                var stepCoordinate = stepCoordinates[currentStep];
 
-                // Center the map on the current step's coordinates
-                if (stepCoordinate) {
-                    map.setView(stepCoordinate, 15);
-                }
-
+                //Make voice to speak (Sounds different depending on OS sounds good on android 14 sound bad on Pop!_os)
                 var msg = new SpeechSynthesisUtterance();
                 msg.text = currentInstruction.text;
                 window.speechSynthesis.speak(msg);
 
-            } else {
+            } 
+            else {
+
+                //Arrived
                 instructionText.innerHTML = "You've reached your destination.";
 
                 // Show location input again if you've reached your destination
@@ -299,10 +278,12 @@
     <script>
 
         var liveLocationMarker = L.marker([0, 0]).addTo(map);
+
         // Function to continuously update the user's location
         function updateLocation() {
             if ("geolocation" in navigator) {
-                navigator.geolocation.watchPosition(function (position) {
+                navigator.geolocation.watchPosition(
+                function (position) {
                     // Retrieve the updated latitude and longitude
                     var latitude = position.coords.latitude;
                     var longitude = position.coords.longitude;
@@ -318,16 +299,18 @@
 
 
 
-                }, function (error) {
+                },
+                function (error) {
                     // Handle any errors that occur when trying to get the updated location
                     console.error("Error updating location: " + error.message);
-                }, {
+                },
+                {
                     enableHighAccuracy: true,  // Use high-accuracy if available
                     maximumAge: 0,             // Disable caching
                     timeout: 1             // Update location every 30 seconds
-                }
-                );
-            } else {
+                });
+            }
+            else {
                 // Geolocation is not available in this browser
                 console.error("Geolocation is not supported in this browser.");
             }
