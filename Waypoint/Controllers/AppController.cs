@@ -26,6 +26,22 @@ namespace Waypoint.Controllers
    }
 
 
+   public class Instruction
+   {
+      public List<double> points { get; set; }
+   }
+
+   public class Path
+   {
+      public List<Instruction> instructions { get; set; }
+   }
+
+   public class RootObject
+   {
+      public List<Path> paths { get; set; }
+   }
+
+
    public class AppController : Controller
    {
       [HttpPost]
@@ -59,7 +75,7 @@ namespace Waypoint.Controllers
       {
          double Longitude = 0;
          double Latitude = 0;
-         
+
          if (coordinates.Contains(','))
          {
             Latitude = Convert.ToDouble(coordinates.Split(',')[0]);
@@ -117,6 +133,4 @@ namespace Waypoint.Controllers
          }
       }
 
-
-   }
-}
+     }}

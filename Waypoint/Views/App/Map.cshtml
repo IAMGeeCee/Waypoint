@@ -90,7 +90,7 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/polyline-encoded@0.0.6/dist/polyline.min.js"> </script>
-    
+
     <!-- Script that loads the map -->
     <script>
         // Function to send data to the server
@@ -112,7 +112,7 @@
 
             xhr.send(JSON.stringify(data));
         }
-        
+
         // Initialize the map with default coordinates
         var map = L.map('map').setView([51.505, -0.09], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -124,24 +124,24 @@
         if ("geolocation" in navigator) {
             // Get the current position
             navigator.geolocation.getCurrentPosition(
-            function (position) {
-                // Retrieve latitude and longitude from the position object
-                var latitude = position.coords.latitude;
-                var longitude = position.coords.longitude;
+                function (position) {
+                    // Retrieve latitude and longitude from the position object
+                    var latitude = position.coords.latitude;
+                    var longitude = position.coords.longitude;
 
-                // Update the map view with the user's coordinates
-                map.setView([latitude, longitude], 13);
+                    // Update the map view with the user's coordinates
+                    map.setView([latitude, longitude], 13);
 
-                console.log("Latitude: " + latitude);
-                console.log("Longitude: " + longitude);
-                sendDataToServer(latitude.toString() + "," + longitude.toString());
+                    console.log("Latitude: " + latitude);
+                    console.log("Longitude: " + longitude);
+                    sendDataToServer(latitude.toString() + "," + longitude.toString());
 
 
-            },
-            function (error) {
-                // Handle any errors that occur when trying to get the location
-                console.error("Error getting location: " + error.message);
-            });
+                },
+                function (error) {
+                    // Handle any errors that occur when trying to get the location
+                    console.error("Error getting location: " + error.message);
+                });
         }
         else {
             // Geolocation is not available in this browser
@@ -152,7 +152,10 @@
     <!-- Draw route on map -->
     <script>
         var jsonData = @Html.Raw(Model);
+        var pointsCoordinates = null;
         drawRoute(jsonData);
+
+        console.log(jsonData);
 
         // Define a function to decode an encoded polyline
         function decodePolyline(encoded) {
@@ -207,6 +210,8 @@
 
                 // Decode the encoded polyline using the custom decode function
                 var coordinates = decodePolyline(encodedPolyline);
+                console.log(coordinates);
+                pointsCoordinates = coordinates;
 
                 // Create a polyline using Leaflet
                 routeLayer = L.polyline(coordinates, { color: 'blue' }).addTo(map);
@@ -248,7 +253,7 @@
                 msg.text = currentInstruction.text;
                 window.speechSynthesis.speak(msg);
 
-            } 
+            }
             else {
 
                 //Arrived
@@ -283,31 +288,31 @@
         function updateLocation() {
             if ("geolocation" in navigator) {
                 navigator.geolocation.watchPosition(
-                function (position) {
-                    // Retrieve the updated latitude and longitude
-                    var latitude = position.coords.latitude;
-                    var longitude = position.coords.longitude;
+                    function (position) {
+                        // Retrieve the updated latitude and longitude
+                        var latitude = position.coords.latitude;
+                        var longitude = position.coords.longitude;
 
-                    // Update the map view with the user's updated coordinates
-                    map.setView([latitude, longitude]);
+                        // Update the map view with the user's updated coordinates
+                        map.setView([latitude, longitude]);
 
-                    // Update the live location marker
-                    liveLocationMarker.setLatLng([latitude, longitude]);
+                        // Update the live location marker
+                        liveLocationMarker.setLatLng([latitude, longitude]);
 
-                    //Update the Current position text box in the form
-                    document.getElementById("currentcoordinates").setAttribute("Value", latitude + "," + longitude)
+                        //Update the Current position text box in the form
+                        document.getElementById("currentcoordinates").setAttribute("Value", latitude + "," + longitude)
 
 
 
-                },
-                function (error) {
-                    
-                },
-                {
-                    enableHighAccuracy: true,  // Use high-accuracy if available
-                    maximumAge: 0,             // Disable caching
-                    timeout: 1             // Update location every 30 seconds
-                });
+                    },
+                    function (error) {
+
+                    },
+                    {
+                        enableHighAccuracy: true,  // Use high-accuracy if available
+                        maximumAge: 0,             // Disable caching
+                        timeout: 1             // Update location every 30 seconds
+                    });
             }
             else {
                 // Geolocation is not available in this browser
@@ -319,4 +324,24 @@
         updateLocation();
 
     </script>
+
+    <!-- Extract end coordinates of each step -->
+    <script>
+        function extractEndCoordinates(routeData) {
+            const steps = jsonData.paths[0].instructions;
+            const endCoordinates = [];
+
+            for (const step of steps) {
+                const lastPoint = step.interval[1]; // Assuming `interval` contains start and end points
+
+                endCoordinates.push(lastPoint);
+            }
+
+            return endCoordinates;
+        }
+        const endCoordinates = extractEndCoordinates(jsonData);
+
+        console.log('End Coordinates:', endCoordinates);
+    </script>
+
 </body>
