@@ -62,8 +62,8 @@ namespace Waypoint.Controllers
          
          if (coordinates.Contains(','))
          {
-            Longitude = Convert.ToDouble(currentcoordinates.Split(',')[0]);
-            Latitude = Convert.ToDouble(currentcoordinates.Split(',')[1]);
+            Latitude = Convert.ToDouble(coordinates.Split(',')[0]);
+            Longitude = Convert.ToDouble(coordinates.Split(',')[1]);
          }
          else
          {
