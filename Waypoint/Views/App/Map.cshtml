@@ -48,6 +48,7 @@
 
         .directions-box {
             display: none;
+            max-width: 760px;
         }
     </style>
 </head>
@@ -77,13 +78,19 @@
         <div id="directions-container" class="ui-container directions-box"
             style="height: 80px; min-width: 500px; color: white; display: hidden;">
             <i id="arrowicon" class="fa-solid fa-arrow-up" style="float: left;margin: 5px;margin-top: 10px;"></i>
-            <span id="instruction-text" style="margin: 10px;margin-top:13px;height: 100%;display: inline-block;">Step 1:
-                Continue</span>
-            <button id="next-instruction-btn" style="float: right;margin:10px;border-radius: 5px;border: none;height: 40px;margin-top: 5px;width: 150px;">Next Instruction</button>
+            <span id="instruction-text" style="margin: 10px;margin-top:13px;height: 100%;display: inline-block;">Continue</span>
+            <button id="next-instruction-btn"
+                style="float: right;margin:10px;border-radius: 5px;border: none;height: 40px;margin-top: 5px;width: 150px;">Next
+                Instruction</button>
         </div>
 
+        <!-- Box with info in -->
+        <div style="position: absolute; bottom: 25px; right: 25px; width: 200px; height: 80px;
+            background: #282a35; border-radius: 5px; z-index: 1000; padding: 15px;color: white;">
+            <h2>Info</h2>
+            <!-- Add content or elements you want in the second box here -->
+        </div>
     </div>
-
 
     <!-- SCRIPTS -->
     <!-- -------------------------------------------------------------------------------------------------------------------------------------- -->
@@ -247,7 +254,7 @@
 
                 //Update step instructions
                 var stepNumber = currentStep + 1;
-                instructionText.innerHTML = "Step " + stepNumber + ": " + currentInstruction.text;
+                instructionText.innerHTML = currentInstruction.text;
 
 
                 //Make voice to speak (Sounds different depending on OS sounds good on android 14 sound bad on Pop!_os)
