@@ -75,9 +75,11 @@
 
         <!-- Box that contains the directions -->
         <div id="directions-container" class="ui-container directions-box"
-            style="height: 100px; width: 500px; color: white; ">
-            <p id="instruction-text">Step 1: Loading directions...</p>
-            <button id="next-instruction-btn">Next Instruction</button>
+            style="height: 80px; min-width: 500px; color: white; display: hidden;">
+            <i id="arrowicon" class="fa-solid fa-arrow-up" style="float: left;margin: 5px;margin-top: 10px;"></i>
+            <span id="instruction-text" style="margin: 10px;margin-top:13px;height: 100%;display: inline-block;">Step 1:
+                Continue</span>
+            <button id="next-instruction-btn" style="float: right;margin:10px;border-radius: 5px;border: none;height: 40px;margin-top: 5px;width: 150px;">Next Instruction</button>
         </div>
 
     </div>
@@ -252,6 +254,32 @@
                 var msg = new SpeechSynthesisUtterance();
                 msg.text = currentInstruction.text;
                 window.speechSynthesis.speak(msg);
+
+                //icon
+                if (currentInstruction.text.toString().toLowerCase().includes("turn right") || currentInstruction.text.toString().toLowerCase().includes("sharp right") || currentInstruction.text.toString().toLowerCase().includes("slight right")) {
+                    document.getElementById("arrowicon").setAttribute("class", "fa-solid fa-arrow-right");
+                }
+                else if (currentInstruction.text.toString().toLowerCase().includes("turn left") || currentInstruction.text.toString().toLowerCase().includes("sharp left") || currentInstruction.text.toString().toLowerCase().includes("slight left")) {
+                    document.getElementById("arrowicon").setAttribute("class", "fa-solid fa-arrow-left");
+                }
+                else if (currentInstruction.text.toString().toLowerCase().includes("roundabout")) {
+                    document.getElementById("arrowicon").setAttribute("class", "fa-solid fa-rotate-right");
+                }
+                else if (currentInstruction.text.toString().toLowerCase().includes("continue")) {
+                    document.getElementById("arrowicon").setAttribute("class", "fa-solid fa-arrow-up");
+                }
+                else if (currentInstruction.text.toString().toLowerCase().includes("keep right")) {
+                    document.getElementById("arrowicon").setAttribute("class", "fa-solid fa-angles-right");
+                }
+                else if (currentInstruction.text.toString().toLowerCase().includes("keep left")) {
+                    document.getElementById("arrowicon").setAttribute("class", "fa-solid fa-angles-left");
+                }
+                else if (currentInstruction.text.toString().toLowerCase().includes("arrived") || currentInstruction.text.toString().toLowerCase().includes("destination")) {
+                    document.getElementById("arrowicon").setAttribute("class", "fa-solid fa-check");
+                }
+                else if (currentInstruction.text.toString().toLowerCase().includes("u-turn")) {
+                    document.getElementById("arrowicon").setAttribute("class", "fa-solid fa-u fa-filp-veritical");
+                }
 
             }
             else {
