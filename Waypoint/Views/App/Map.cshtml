@@ -11,13 +11,16 @@
 
     <style>
         .ui-container {
-            bottom: 25px;
-            left: 25px;
             background: #282a35;
             border-radius: 5px;
             position: absolute;
             z-index: 1000;
             padding: 15px;
+        }
+
+        .direction-input-container{
+            bottom: 5px;
+            left:5px;
         }
 
         .map-container {
@@ -27,6 +30,9 @@
 
         .back-button {
             display: none;
+            position: absolute;
+            left:5px;
+            bottom:5px;
         }
 
         @@media (pointer: none), (pointer: coarse) {
@@ -47,8 +53,14 @@
         }
 
         .directions-box {
-            display: none;
-            max-width: 760px;
+            display: none;           
+            height: 80px;
+            color: white;
+
+            position: absolute;
+            left:5px;
+            right:5px;
+            bottom:5px;
         }
     </style>
 </head>
@@ -61,8 +73,7 @@
         <div id="map" style="height: 100%;"></div>
 
         <!-- The input for navigation -->
-        <form asp-controller="App" asp-action="CalculateDirections" method="post"
-            class="ui-container direction-input-container" id="frm-nav-input">
+        <form asp-controller="App" asp-action="CalculateDirections" method="post" class="ui-container direction-input-container" id="frm-nav-input">
             <input type="hidden" name="currentcoordinates" id="currentcoordinates" />
             <input type="text" name="coordinates" id="txt-coordinates" placeholder="Enter lat,long or Postcode" />
             <input type="submit" value="Navigate" id="btn-start-navigation" />
@@ -75,22 +86,25 @@
         </a>
 
         <!-- Box that contains the directions -->
-        <div id="directions-container" class="ui-container directions-box"
-            style="height: 80px; min-width: 500px; color: white; display: hidden;">
+        <div id="directions-container" class="ui-container directions-box">
             <i id="arrowicon" class="fa-solid fa-arrow-up" style="float: left;margin: 5px;margin-top: 10px;"></i>
             <span id="instruction-text" style="margin: 10px;margin-top:13px;height: 100%;display: inline-block;">Continue</span>
-            <button id="next-instruction-btn"
-                style="float: right;margin:10px;border-radius: 5px;border: none;height: 40px;margin-top: 5px;width: 150px;">Next
-                Instruction</button>
-        </div>
-
-        <!-- Box with info in -->
-        <div style="position: absolute; bottom: 25px; right: 25px; width: 200px; height: 80px;
-            background: #282a35; border-radius: 5px; z-index: 1000; padding: 15px;color: white;">
-            <h2>Info</h2>
-            <!-- Add content or elements you want in the second box here -->
+            <button id="next-instruction-btn" style="float: right;margin:10px;border-radius: 5px;border: none;height: 40px;margin-top: 5px;width: 150px;">Next Instruction</button>
         </div>
     </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <!-- SCRIPTS -->
     <!-- -------------------------------------------------------------------------------------------------------------------------------------- -->
