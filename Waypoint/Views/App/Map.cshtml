@@ -18,9 +18,9 @@
             padding: 15px;
         }
 
-        .direction-input-container{
+        .direction-input-container {
             bottom: 5px;
-            left:5px;
+            left: 5px;
         }
 
         .map-container {
@@ -31,8 +31,8 @@
         .back-button {
             display: none;
             position: absolute;
-            left:5px;
-            bottom:5px;
+            left: 5px;
+            bottom: 5px;
         }
 
         @@media (pointer: none), (pointer: coarse) {
@@ -53,14 +53,25 @@
         }
 
         .directions-box {
-            display: none;           
+            display: none;
             height: 80px;
             color: white;
 
             position: absolute;
-            left:5px;
-            right:5px;
-            bottom:5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+        }
+
+        .infobox {
+            height: 100%;
+            width: 400px;
+            float: right;
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            margin: -5px;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -73,7 +84,8 @@
         <div id="map" style="height: 100%;"></div>
 
         <!-- The input for navigation -->
-        <form asp-controller="App" asp-action="CalculateDirections" method="post" class="ui-container direction-input-container" id="frm-nav-input">
+        <form asp-controller="App" asp-action="CalculateDirections" method="post"
+            class="ui-container direction-input-container" id="frm-nav-input">
             <input type="hidden" name="currentcoordinates" id="currentcoordinates" />
             <input type="text" name="coordinates" id="txt-coordinates" placeholder="Enter lat,long or Postcode" />
             <input type="submit" value="Navigate" id="btn-start-navigation" />
@@ -88,8 +100,14 @@
         <!-- Box that contains the directions -->
         <div id="directions-container" class="ui-container directions-box">
             <i id="arrowicon" class="fa-solid fa-arrow-up" style="float: left;margin: 5px;margin-top: 10px;"></i>
-            <span id="instruction-text" style="margin: 10px;margin-top:13px;height: 100%;display: inline-block;">Continue</span>
-            <button id="next-instruction-btn" style="float: right;margin:10px;border-radius: 5px;border: none;height: 40px;margin-top: 5px;width: 150px;">Next Instruction</button>
+            <span id="instruction-text"
+                style="margin: 10px;margin-top:13px;height: 100%;display: inline-block;">Continue</span>
+            <button id="next-instruction-btn"
+                style="margin:10px;border-radius: 5px;border: none;height: 40px;margin-top: 5px;width: 150px;">Next
+                Instruction</button>
+
+
+            <div class="infobox"></div>
         </div>
     </div>
 
@@ -394,4 +412,3 @@
     </script>
 
 </body>
-
