@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Net;
 
+
 namespace Waypoint.Controllers
 {
    public class LocationData
