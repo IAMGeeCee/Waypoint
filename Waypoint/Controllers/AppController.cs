@@ -45,6 +45,9 @@ namespace Waypoint.Controllers
 
    public class AppController : Controller
    {
+      public double EndLongitude = 12;
+      public double EndLatitude;
+
       [HttpPost]
       public IActionResult ReceiveLocation([FromBody] string data)
       {
@@ -134,4 +137,10 @@ namespace Waypoint.Controllers
          }
       }
 
-     }}
+      public IActionResult GetEndLongitude()
+      {
+         return Json(EndLongitude);
+      }
+   }
+
+}
