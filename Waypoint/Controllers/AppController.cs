@@ -1,5 +1,6 @@
 ﻿﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
@@ -42,17 +43,20 @@ namespace Waypoint.Controllers
       public List<Path> paths { get; set; }
    }
 
-
    public class AppController : Controller
    {
-      public double EndLongitude = 12;
-      public double EndLatitude;
 
       [HttpPost]
       public IActionResult ReceiveLocation([FromBody] string data)
       {
          HttpContext.Session.SetString("CurrentLocation", data);
          return Content("Data received successfully: " + data);
+      }
+
+      [HttpPost]
+      public IActionResult RetrieveEndLocation([FromBody] string data)
+      {
+         return Content("Data received successfully: " + HttpContext.Session.GetString("EndCoordinates"));
       }
 
       public IActionResult Index()
@@ -77,6 +81,8 @@ namespace Waypoint.Controllers
 
       public async Task<IActionResult> CalculateDirections(string currentcoordinates, string coordinates)
       {
+
+
          double Longitude = 0;
          double Latitude = 0;
 
@@ -117,6 +123,7 @@ namespace Waypoint.Controllers
             }
          }
 
+         HttpContext.Session.SetString("EndCoordinates", Latitude.ToString()+","+Longitude.ToString());
 
          string apiKey = "88ed98eb-c3dc-4b84-be54-f3862db93f24";
          string apiUrl = $"https://graphhopper.com/api/1/route?point={currentcoordinates}&point={Latitude},{Longitude}&vehicle=car&locale=en&key={apiKey}&instructions=true&point_hint=0.0&point_hint=1.0";
@@ -137,10 +144,5 @@ namespace Waypoint.Controllers
          }
       }
 
-      public IActionResult GetEndLongitude()
-      {
-         return Json(EndLongitude);
-      }
    }
-
 }

@@ -26,7 +26,7 @@
         .map-container {
             position: relative;
             height: 100%;
-            overflow-y:hidden;
+            overflow-y: hidden;
         }
 
         .back-button {
@@ -131,7 +131,7 @@
     <!-- Dependancies -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
+
     <!-- Script that loads the map -->
     <script>
         // Function to send data to the server
@@ -173,8 +173,6 @@
                     // Update the map view with the user's coordinates
                     map.setView([latitude, longitude], 13);
 
-                    console.log("Latitude: " + latitude);
-                    console.log("Longitude: " + longitude);
                     sendDataToServer(latitude.toString() + "," + longitude.toString());
 
 
@@ -196,6 +194,7 @@
         var pointsCoordinates = null;
         drawRoute(jsonData);
 
+        console.log("json route data:  ");
         console.log(jsonData);
 
         // Define a function to decode an encoded polyline
@@ -251,6 +250,7 @@
 
                 // Decode the encoded polyline using the custom decode function
                 var coordinates = decodePolyline(encodedPolyline);
+                console.log("list of coordinates for each step:  ");
                 console.log(coordinates);
                 pointsCoordinates = coordinates;
 
@@ -265,7 +265,6 @@
 
     <!-- Show step-by-step navigation instructions -->
     <script>
-
         // Variables
         var jsonData = @Html.Raw(Model);
         var instructions = jsonData.paths[0].instructions;
@@ -344,6 +343,29 @@
             currentStep++;
             displayCurrentInstruction();
         });
+        
+    </script>
+
+    <!-- Get more info about the navigaiton -->
+    <script>
+          function RetrieveEndLocation(data) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "@Url.Action("RetrieveEndLocation", "App")", true);
+            xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        // Handle the response from the server if needed
+                        console.log("Data received from the server (EndLocation) :", xhr.responseText);
+                    } else {
+                        console.error("Error sending data to the server. Status: " + xhr.status);
+                    }
+                }
+            };
+
+            xhr.send(JSON.stringify(data));
+        }
     </script>
 
     <!-- Live location -->
@@ -392,25 +414,7 @@
 
     </script>
 
-    <script>
-        function getEndLong() {
-        $.ajax({
-            url: '@Url.Action("GetEndLongitude", "AppContoller")',
-            type: 'GET',
-            success: function (data) {
-                var Endlong = data;
-                console.log("The value of EndLongitude is: " + EndLong);
-            },
-            error: function () {
-                console.error("Failed to retrieve the double value.");
-            }
-        });
-    }
-   
-        getEndLong();
-    </script>
-
-    <!-- Extract end coordinates of each step 
+    <!-- Extract end coordinates of each step !NOT TO BE CONFUSED WITH THE OTHER END COORDINATES
     <script>
         function extractEndCoordinates(routeData) {
             const steps = jsonData.paths[0].instructions;
