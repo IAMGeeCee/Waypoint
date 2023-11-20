@@ -50,13 +50,13 @@ namespace Waypoint.Controllers
       public IActionResult ReceiveLocation([FromBody] string data)
       {
          HttpContext.Session.SetString("CurrentLocation", data);
-         return Content("Data received successfully: " + data);
+         return Content(data);
       }
 
       [HttpPost]
       public IActionResult RetrieveEndLocation([FromBody] string data)
       {
-         return Content("Data received successfully: " + HttpContext.Session.GetString("EndCoordinates"));
+         return Content(HttpContext.Session.GetString("EndCoordinates"));
       }
 
       public IActionResult Index()
