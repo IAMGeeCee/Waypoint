@@ -26,7 +26,7 @@
         .map-container {
             position: relative;
             height: 100%;
-            overflow-y:hidden;
+            overflow-y: hidden;
         }
 
         .back-button {
@@ -66,13 +66,17 @@
 
         .infobox {
             height: 100%;
-            width: 400px;
             float: right;
             position: absolute;
             bottom: 5px;
             right: 5px;
             margin: -5px;
             border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: right;
+            margin-right:25px;
         }
     </style>
 </head>
@@ -108,7 +112,7 @@
                 Instruction</button>
 
 
-            <div class="infobox"></div>
+            <div id="infobox" class="infobox"></div>
         </div>
     </div>
 
@@ -131,7 +135,6 @@
     <!-- Dependancies -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/polyline-encoded@0.0.6/dist/polyline.min.js"> </script>
 
     <!-- Script that loads the map -->
     <script>
@@ -145,7 +148,7 @@
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
                         // Handle the response from the server if needed
-                        console.log("Data received from the server:", xhr.responseText);
+                        console.log("Data received from the server (Current Location) :", xhr.responseText);
                     } else {
                         console.error("Error sending data to the server. Status: " + xhr.status);
                     }
@@ -174,8 +177,6 @@
                     // Update the map view with the user's coordinates
                     map.setView([latitude, longitude], 13);
 
-                    console.log("Latitude: " + latitude);
-                    console.log("Longitude: " + longitude);
                     sendDataToServer(latitude.toString() + "," + longitude.toString());
 
 
@@ -193,10 +194,15 @@
 
     <!-- Draw route on map -->
     <script>
+        let IsNavigating = false;
+
+
+
         var jsonData = @Html.Raw(Model);
         var pointsCoordinates = null;
         drawRoute(jsonData);
 
+        console.log("json route data:  ");
         console.log(jsonData);
 
         // Define a function to decode an encoded polyline
@@ -247,11 +253,14 @@
                     map.removeLayer(routeLayer);
                 }
 
+                IsNavigating = true;
+
                 // Extract the encoded polyline from the route data
                 var encodedPolyline = routeData.paths[0].points;
 
                 // Decode the encoded polyline using the custom decode function
                 var coordinates = decodePolyline(encodedPolyline);
+                console.log("list of coordinates for each step:  ");
                 console.log(coordinates);
                 pointsCoordinates = coordinates;
 
@@ -266,7 +275,6 @@
 
     <!-- Show step-by-step navigation instructions -->
     <script>
-
         // Variables
         var jsonData = @Html.Raw(Model);
         var instructions = jsonData.paths[0].instructions;
@@ -331,6 +339,7 @@
                 document.getElementById("frm-nav-input").style.display = "block";
                 document.getElementById("directions-container").style.display = "none";
 
+                IsNavigating = false;
                 if (typeof routeLayer !== 'undefined') {
                     map.removeLayer(routeLayer);
                 }
@@ -345,10 +354,59 @@
             currentStep++;
             displayCurrentInstruction();
         });
+
+    </script>
+
+    <!-- Get more info about the navigaiton -->
+    <script>
+        let CurrentEndLocation = "";
+        let EndLocationArray;
+        let CurrentEndLat;
+        let CurrentEndLong;
+
+        function RetrieveEndLocation(data) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "@Url.Action("RetrieveEndLocation", "App")", true);
+            xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        // Handle the response from the server if needed
+                        console.log("Data received from the server (EndLocation) :", xhr.responseText);
+                        CurrentEndLocation = xhr.responseText;
+                    } else {
+                        console.error("Error sending data to the server. Status: " + xhr.status);
+                    }
+                }
+            };
+
+            xhr.send(JSON.stringify(data));
+        }
     </script>
 
     <!-- Live location -->
     <script>
+        function haversineDistance(lat1, lon1, lat2, lon2) {
+            const R = 3958.8; // Earth radius in miles
+
+            const dLat = toRadians(lat2 - lat1);
+            const dLon = toRadians(lon2 - lon1);
+
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+            const distance = R * c;
+
+            return distance;
+        }
+
+        function toRadians(degrees) {
+            return degrees * (Math.PI / 180);
+        }
 
         var liveLocationMarker = L.marker([0, 0]).addTo(map);
 
@@ -371,7 +429,29 @@
                         document.getElementById("currentcoordinates").setAttribute("Value", latitude + "," + longitude)
 
 
+                        // Work out how long left of navigation
+                        if (IsNavigating) {
+                            RetrieveEndLocation("Why are you reading this lol");
 
+                            // Split the string into latitude and longitude
+                            EndLocationArray = CurrentEndLocation.split(',');
+
+                            CurrentEndLat = EndLocationArray[0];
+                            CurrentEndLong = EndLocationArray[1];
+
+
+                            // Convert the values to numbers if needed
+                            const parsedCurrentEndLat = parseFloat(CurrentEndLat);
+                            const parsedCurrentEndLong = parseFloat(CurrentEndLong);
+
+                            console.log("ParsedCurrentEndLat is " + parsedCurrentEndLat);
+                            console.log("ParsedCurrentEndLong is " + parsedCurrentEndLong);
+
+                            const distance = haversineDistance(latitude, longitude, parsedCurrentEndLat, parsedCurrentEndLong);
+                            console.log(distance);
+
+                            document.getElementById('infobox').innerText = Math.round(distance) + " miles left"
+                        }
                     },
                     function (error) {
 
@@ -393,7 +473,7 @@
 
     </script>
 
-    <!-- Extract end coordinates of each step -->
+    <!-- Extract end coordinates of each step !NOT TO BE CONFUSED WITH THE OTHER END COORDINATES
     <script>
         function extractEndCoordinates(routeData) {
             const steps = jsonData.paths[0].instructions;
@@ -411,5 +491,5 @@
 
         console.log('End Coordinates:', endCoordinates);
     </script>
-
+    -->
 </body>
