@@ -448,7 +448,7 @@
                             console.log("ParsedCurrentEndLong is " + parsedCurrentEndLong);
 
                             const distance = haversineDistance(latitude, longitude, parsedCurrentEndLat, parsedCurrentEndLong);
-                            console.log(distance);
+                            console.log(distance + " miles left");
 
                             document.getElementById('infobox').innerText = Math.round(distance) + " miles left"
                         }
