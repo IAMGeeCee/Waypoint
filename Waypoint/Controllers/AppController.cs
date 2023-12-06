@@ -17,30 +17,30 @@ namespace Waypoint.Controllers
 
    public class PostcodeInfo
    {
-      public int status { get; set; }
-      public Result result { get; set; }
+      public int Status { get; set; }
+      public Result? Result { get; set; }
    }
 
    public class Result
    {
-      public double latitude { get; set; }
-      public double longitude { get; set; }
+      public double Latitude { get; set; }
+      public double Longitude { get; set; }
    }
 
 
    public class Instruction
    {
-      public List<double> points { get; set; }
+      public List<double>? Points { get; set; }
    }
 
    public class Path
    {
-      public List<Instruction> instructions { get; set; }
+      public List<Instruction>? Instructions { get; set; }
    }
 
    public class RootObject
    {
-      public List<Path> paths { get; set; }
+      public List<Path>? Paths { get; set; }
    }
 
    public class AppController : Controller
@@ -97,38 +97,36 @@ namespace Waypoint.Controllers
 
             string apiURL = $"https://api.postcodes.io/postcodes/{coordinates}";
 
-            using (HttpClient client = new HttpClient())
-            {
-               HttpResponseMessage response = await client.GetAsync(apiURL);
+                using HttpClient client = new();
+                HttpResponseMessage response = await client.GetAsync(apiURL);
 
-               if (response.IsSuccessStatusCode)
-               {
-                  string json = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = await response.Content.ReadAsStringAsync();
 
-                  // Deserialize the JSON response
-                  var postcodeInfo = JsonConvert.DeserializeObject<PostcodeInfo>(json);
+                    // Deserialize the JSON response
+                    var postcodeInfo = JsonConvert.DeserializeObject<PostcodeInfo>(json);
 
-                  if (postcodeInfo != null && postcodeInfo.result != null)
-                  {
-                     Latitude = postcodeInfo.result.latitude;
-                     Longitude = postcodeInfo.result.longitude;
+                    if (postcodeInfo != null && postcodeInfo.Result != null)
+                    {
+                        Latitude = postcodeInfo.Result.Latitude;
+                        Longitude = postcodeInfo.Result.Longitude;
 
-                     // Now, you have latitude and longitude as doubles
-                  }
-               }
-               else
-               {
-                  throw new Exception($"Postcode API request failed with status code {response.StatusCode}");
-               }
+                        // Now, you have latitude and longitude as doubles
+                    }
+                }
+                else
+                {
+                    throw new Exception($"Postcode API request failed with status code {response.StatusCode}");
+                }
             }
-         }
 
          HttpContext.Session.SetString("EndCoordinates", Latitude.ToString()+","+Longitude.ToString());
 
          string apiKey = "88ed98eb-c3dc-4b84-be54-f3862db93f24";
          string apiUrl = $"https://graphhopper.com/api/1/route?point={currentcoordinates}&point={Latitude},{Longitude}&vehicle=car&locale=en&key={apiKey}&instructions=true&point_hint=0.0&point_hint=1.0";
 
-         using (HttpClient client = new HttpClient())
+         using (HttpClient client = new())
          {
             HttpResponseMessage response = await client.GetAsync(apiUrl);
 
