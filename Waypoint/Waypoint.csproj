@@ -1,26 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
-
   <ItemGroup>
     <UpToDateCheckInput Remove="Views/App/Map.cshtml" />
   </ItemGroup>
-
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Views/App/Map.cshtml" />
   </ItemGroup>
-
   <ItemGroup>
     <Folder Include="Models/" />
     <Folder Include="wwwroot/css/" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
-
 </Project>
